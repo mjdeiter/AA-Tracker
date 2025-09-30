@@ -1,7 +1,7 @@
 local mq = require('mq')
 local ImGui = require('ImGui')
 
-local SCRIPT_VERSION = "1.0"  -- Define the script version here
+local SCRIPT_VERSION = "1.0"
 
 local start_aa_total = 0
 local start_aa_exp = 0
@@ -13,12 +13,10 @@ local paused = false
 local open = true
 local terminate = false
 
--- Simple log function (can be expanded if needed)
 local function logMessage(msg)
-    print("\ay" .. msg)  -- Using yellow color for logs; adjust as needed
+    print("\ay" .. msg)
 end
 
--- Display credit message and version
 print("\atOriginally created by Alektra <Lederhosen>")
 print("\agAA Tracker v" .. SCRIPT_VERSION .. " Loaded")
 logMessage("Script started")
@@ -114,21 +112,13 @@ local function closeGUI()
     print("GUI termination triggered via /closegui.")
 end
 
-if ImGui then
-    local success, err = pcall(mq.imgui.init, 'AATracker', drawGUI)
-    if not success then
-        print("Failed to initialize ImGui: " .. err)
-        return
-    end
-    mq.bind('/closegui', closeGUI)
-end
+mq.imgui.init('AATracker', drawGUI)
+mq.bind('/closegui', closeGUI)
 
 while mq.TLO.MacroQuest.GameState() == "INGAME" and not terminate do
     mq.doevents()
-    mq.delay(1000)  -- Update every second
+    mq.delay(1000)
 end
 
-if ImGui then
-    mq.imgui.destroy('AATracker')
-    print("GUI destroyed.")
-end
+mq.imgui.destroy('AATracker')
+print("GUI destroyed.")
