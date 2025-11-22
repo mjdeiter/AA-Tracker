@@ -1,7 +1,7 @@
 local mq = require('mq')
 local ImGui = require('ImGui')
 
-local SCRIPT_VERSION = "1.0"  -- Define the script version here
+local SCRIPT_VERSION = "1.1"  -- Updated version
 
 local start_aa_total = 0
 local start_aa_exp = 0
@@ -39,6 +39,16 @@ local function drawGUI()
         ImGui.End()
         return
     end
+
+    -- Display current AA points at the top
+    local curr_aa_total = mq.TLO.Me.AAPointsTotal()
+    local curr_aa_exp = mq.TLO.Me.AAExp() / 100
+    local curr_aa_spent = mq.TLO.Me.AAPointsSpent()
+    local curr_aa_unspent = mq.TLO.Me.AAPoints()
+    
+    ImGui.Text(string.format('Current AA Points: %d (%.2f%% toward next)', curr_aa_total, curr_aa_exp))
+    ImGui.Text(string.format('Unspent: %d | Spent: %d', curr_aa_unspent, curr_aa_spent))
+    ImGui.Separator()
 
     if ImGui.Button(tracking and 'Stop' or 'Start') then
         if not tracking then
@@ -79,9 +89,9 @@ local function drawGUI()
         print('Script ending.')
     end
 
+    ImGui.Separator()
+
     if tracking then
-        local curr_aa_total = mq.TLO.Me.AAPointsTotal()
-        local curr_aa_exp = mq.TLO.Me.AAExp() / 100
         local current_time = os.time()
         local adjusted_time = current_time - paused_time
         if paused then
