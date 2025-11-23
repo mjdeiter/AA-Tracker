@@ -1,7 +1,7 @@
 local mq = require('mq')
 local ImGui = require('ImGui')
 
-local SCRIPT_VERSION = "1.1"  -- Updated version
+local SCRIPT_VERSION = "1.2"  -- Updated version
 
 local start_aa_total = 0
 local start_aa_exp = 0
@@ -12,6 +12,7 @@ local tracking = false
 local paused = false
 local open = true
 local terminate = false
+local show_current_aa = true  -- Toggle for showing/hiding current AA section
 
 -- Simple log function (can be expanded if needed)
 local function logMessage(msg)
@@ -40,15 +41,23 @@ local function drawGUI()
         return
     end
 
-    -- Display current AA points at the top
-    local curr_aa_total = mq.TLO.Me.AAPointsTotal()
-    local curr_aa_exp = mq.TLO.Me.AAExp() / 100
-    local curr_aa_spent = mq.TLO.Me.AAPointsSpent()
-    local curr_aa_unspent = mq.TLO.Me.AAPoints()
-    
-    ImGui.Text(string.format('Current AA Points: %d (%.2f%% toward next)', curr_aa_total, curr_aa_exp))
-    ImGui.Text(string.format('Unspent: %d | Spent: %d', curr_aa_unspent, curr_aa_spent))
+    -- Toggle button for current AA display
+    if ImGui.Button(show_current_aa and 'Hide Current AA' or 'Show Current AA') then
+        show_current_aa = not show_current_aa
+    end
     ImGui.Separator()
+
+    -- Display current AA points at the top (if enabled)
+    if show_current_aa then
+        local curr_aa_total = mq.TLO.Me.AAPointsTotal()
+        local curr_aa_exp = mq.TLO.Me.AAExp() / 100
+        local curr_aa_spent = mq.TLO.Me.AAPointsSpent()
+        local curr_aa_unspent = mq.TLO.Me.AAPoints()
+        
+        ImGui.Text(string.format('Current AA Points: %d (%.2f%% toward next)', curr_aa_total, curr_aa_exp))
+        ImGui.Text(string.format('Unspent: %d | Spent: %d', curr_aa_unspent, curr_aa_spent))
+        ImGui.Separator()
+    end
 
     if ImGui.Button(tracking and 'Stop' or 'Start') then
         if not tracking then
@@ -92,22 +101,25 @@ local function drawGUI()
     ImGui.Separator()
 
     if tracking then
+        local curr_aa_total = mq.TLO.Me.AAPointsTotal()
+        local curr_aa_exp = mq.TLO.Me.AAExp() / 100
         local current_time = os.time()
         local adjusted_time = current_time - paused_time
         if paused then
             adjusted_time = adjusted_time - (current_time - last_pause_time)
         end
         local time_seconds = adjusted_time - start_time
-        local time_hours = time_seconds / 3600
+        local time_hours = math.floor(time_seconds / 3600)
+        local time_minutes = math.floor((time_seconds % 3600) / 60)
         local aa_points_gained = curr_aa_total - start_aa_total
         local aa_exp_gained = aa_points_gained * 100 + (curr_aa_exp - start_aa_exp)
         local partial_progress = (aa_points_gained > 0 and curr_aa_exp or (curr_aa_exp - start_aa_exp))
-        local aa_per_hour = (time_hours > 0 and (aa_exp_gained / 100 / time_hours) or 0)
-        local exp_per_hour = (time_hours > 0 and (aa_exp_gained / time_hours) or 0)
+        local aa_per_hour = ((time_seconds / 3600) > 0 and (aa_exp_gained / 100 / (time_seconds / 3600)) or 0)
+        local exp_per_hour = ((time_seconds / 3600) > 0 and (aa_exp_gained / (time_seconds / 3600)) or 0)
 
         ImGui.Text(string.format('AA Gained: %d (plus %.2f%% toward next)', aa_points_gained, partial_progress))
         ImGui.Text(string.format('Total Equivalent: %.2f AA', aa_exp_gained / 100))
-        ImGui.Text(string.format('Time Elapsed: %.2f hours', time_hours))
+        ImGui.Text(string.format('Time Elapsed: %02d:%02d', time_hours, time_minutes))
         ImGui.Text(string.format('Rate: %.2f AA/hour (%.2f%%/hour)', aa_per_hour, exp_per_hour))
         if paused then
             ImGui.Text('Tracking is paused.')
