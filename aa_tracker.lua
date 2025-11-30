@@ -1,7 +1,7 @@
 local mq = require('mq')
 local ImGui = require('ImGui')
 
-local SCRIPT_VERSION = "1.2"  -- Updated version
+local SCRIPT_VERSION = "1.3"  -- Updated version
 
 local start_aa_total = 0
 local start_aa_exp = 0
@@ -34,6 +34,15 @@ local function resetTracking()
     print("Tracking reset. AA Total: " .. start_aa_total .. ", AA Exp: " .. start_aa_exp .. "%, Time: " .. os.date('%H:%M:%S', start_time))
 end
 
+local function announceAllGroup()
+    -- E3Next command with /noparse to delay variable evaluation
+    -- The /noparse must come BEFORE the broadcast command
+    mq.cmd('/noparse /e3bcga /gsay ${Me.Name} - Unspent AA: ${Me.AAPoints} | Spent: ${Me.AAPointsSpent}')
+    
+    print('Sent announce command to all group members via /e3bcga')
+    print('(If only you announced, make sure E3Next is running on all characters)')
+end
+
 local function drawGUI()
     open, _ = ImGui.Begin('AA Tracker', open)
     if not open then
@@ -44,6 +53,11 @@ local function drawGUI()
     -- Toggle button for current AA display
     if ImGui.Button(show_current_aa and 'Hide Current AA' or 'Show Current AA') then
         show_current_aa = not show_current_aa
+    end
+    ImGui.SameLine()
+    -- Announce All Group button
+    if ImGui.Button('Announce All Group') then
+        announceAllGroup()
     end
     ImGui.Separator()
 
