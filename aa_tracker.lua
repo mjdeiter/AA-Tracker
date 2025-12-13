@@ -1,7 +1,7 @@
 local mq = require('mq')
 local ImGui = require('ImGui')
 
-local SCRIPT_VERSION = "1.3"  -- Updated version
+local SCRIPT_VERSION = "1.4"  -- Updated version
 
 local start_aa_total = 0
 local start_aa_exp = 0
@@ -20,8 +20,8 @@ local function logMessage(msg)
 end
 
 -- Display credit message and version
+print("\atAA Tracker v" .. SCRIPT_VERSION)
 print("\atOriginally created by Alektra <Lederhosen>")
-print("\agAA Tracker v" .. SCRIPT_VERSION .. " Loaded")
 logMessage("Script started")
 
 local function resetTracking()
@@ -43,8 +43,17 @@ local function announceAllGroup()
     print('(If only you announced, make sure E3Next is running on all characters)')
 end
 
+local function announceAllGuild()
+    -- E3Next command with /noparse to delay variable evaluation
+    -- Using /guildsay instead of /gsay
+    mq.cmd('/noparse /e3bcga /guildsay ${Me.Name} - Unspent AA: ${Me.AAPoints} | Spent: ${Me.AAPointsSpent}')
+    
+    print('Sent announce command to all guild members via /e3bcga')
+    print('(If only you announced, make sure E3Next is running on all characters)')
+end
+
 local function drawGUI()
-    open, _ = ImGui.Begin('AA Tracker', open)
+    open, _ = ImGui.Begin('AA Tracker v' .. SCRIPT_VERSION, open)
     if not open then
         ImGui.End()
         return
@@ -58,6 +67,11 @@ local function drawGUI()
     -- Announce All Group button
     if ImGui.Button('Announce All Group') then
         announceAllGroup()
+    end
+    ImGui.SameLine()
+    -- Announce All Guild button
+    if ImGui.Button('Announce All Guild') then
+        announceAllGuild()
     end
     ImGui.Separator()
 
