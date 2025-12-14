@@ -8,7 +8,6 @@
 ## Credits
 **Created by:** Alektra  
 **For:** Project Lazarus EverQuest EMU Server  
-**Support:** https://buymeacoffee.com/shablagu
 
 ---
 
