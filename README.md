@@ -1,3 +1,6 @@
+[![Support](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-yellow)](https://buymeacoffee.com/shablagu)
+
+
 # AA Tracker Script for EverQuest (Project Lazarus Server)
 
 ---
