@@ -4,6 +4,9 @@
 
 # AA Tracker Script for EverQuest (Project Lazarus Server)
 
+<img width="307" height="261" alt="image" src="https://github.com/user-attachments/assets/abc3af02-d30b-4bec-9807-a2fbd5f1ee68" />
+
+
 ---
 
 ## Credits
